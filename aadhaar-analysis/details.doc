@@ -1,5 +1,91 @@
 Data in uadia.csv
 Scala program for spark:
 
+---------------------------------
+package com.sparkTutorial.sparkSql.aadhaar
+
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark.sql.SparkSession
+
+object AaadharAnalysis {
 
 
+  def main(args: Array[String]) {
+
+    Logger.getLogger("org").setLevel(Level.ERROR)
+    val session = SparkSession.builder().appName("AaadharAnalysis").master("local[1]").getOrCreate()
+
+    val aadharData = session.read
+      .option("header", "true")
+      .option("inferSchema", value = true)
+      .csv("in/myData/UIDAI-ENR-DETAIL-20180107.csv")
+
+   //Count the number of Identities generated in each state
+   aadharData.groupBy("State")
+      .count()
+      .orderBy("State")
+      .show()
+/*+------------------+-----+
+|               State|count|
++--------------------+-----+
+|Andaman and Nicob...|   27|
+|      Andhra Pradesh| 8308|
+|   Arunachal Pradesh| 1529|
+|               Assam| 3327|
+|               Bihar|30564|
+|          Chandigarh|   87|
+|        Chhattisgarh|  450|
+|Dadra and Nagar H...|   20|
+|       Daman and Diu|   19|
+|               Delhi| 3550|
+|                 Goa|  687|
+|             Gujarat| 3453|
+|             Haryana| 1104|
+|    Himachal Pradesh|  475|
+|   Jammu and Kashmir| 2329|
+|           Jharkhand| 4664|
+|           Karnataka| 3336|
+|              Kerala| 9093|
+|         Lakshadweep|    6|
+|      Madhya Pradesh|10575|
++--------------------+-----+
+only showing top 20 rows   
+ */     
+      
+      
+      
+  }
+}
+---------------------
+//Count the number of Identities generated in each state Genderwise
+
+aadharData.groupBy("State","Gender")
+      .count()
+      .orderBy("State","Gender")
+      .show()
++--------------------+------+-----+
+|               State|Gender|count|
++--------------------+------+-----+
+|Andaman and Nicob...|     F|   13|
+|Andaman and Nicob...|     M|   14|
+|      Andhra Pradesh|     F| 1373|
+|      Andhra Pradesh|     M| 6935|
+|   Arunachal Pradesh|     F|  738|
+|   Arunachal Pradesh|     M|  791|
+|               Assam|     F|  562|
+|               Assam|     M| 2765|
+|               Bihar|     F| 8838|
+|               Bihar|     M|21726|
+|          Chandigarh|     F|   23|
+|          Chandigarh|     M|   64|
+|        Chhattisgarh|     F|  296|
+|        Chhattisgarh|     M|  154|
+|Dadra and Nagar H...|     F|    2|
+|Dadra and Nagar H...|     M|   18|
+|       Daman and Diu|     F|    8|
+|       Daman and Diu|     M|   11|
+|               Delhi|     F|  238|
+|               Delhi|     M| 3312|
++--------------------+------+-----+
+    
+      
