@@ -190,31 +190,67 @@ aadharData.groupBy("District","State")
 aadharData.groupBy("District","State")
       .agg("Age" -> "avg")
       .withColumnRenamed("avg(Age)", "Avg Age")
-      .select("District","State","Avg Age")
+      .withColumn("AvAge", format_number(org.apache.spark.sql.functions.col("Avg Age"),4))
+      .select("District","State","AvAge")
       .withColumnRenamed("State", "Of State")
       .orderBy(org.apache.spark.sql.functions.col("Avg Age").desc)
       .show()
-+--------------------+-----------------+------------------+
-|            District|         Of State|           Avg Age|
-+--------------------+-----------------+------------------+
-|     Lahul and Spiti| Himachal Pradesh|              56.0|
-|        Kamrup Metro|            Assam|37.345238095238095|
-|     West Garo Hills|        Meghalaya|37.091743119266056|
-|     East Garo Hills|        Meghalaya|             33.92|
-|            Junagadh|          Gujarat| 33.76923076923077|
-|           Porbandar|          Gujarat| 33.56666666666667|
-|             Ri Bhoi|        Meghalaya| 33.50819672131148|
-|South West Khasi ...|        Meghalaya|              33.5|
-|  West Jaintia Hills|        Meghalaya|33.103896103896105|
-|                 Diu|    Daman and Diu|              33.0|
-|             Kolkata|      West Bengal|  32.9719222462203|
-|           Jalandhar|           Punjab|32.776595744680854|
-|             Jashpur|     Chhattisgarh|              31.8|
-|            Srinagar|Jammu and Kashmir| 31.79310344827586|
-|               Udupi|        Karnataka|31.783333333333335|
-|          Kapurthala|           Punjab| 31.71563981042654|
-|           South Goa|              Goa|31.709333333333333|
-|                Moga|           Punjab|31.507462686567163|
-|              Cachar|            Assam| 31.33730158730159|
-|            Tinsukia|            Assam|31.266666666666666|
-+--------------------+-----------------+------------------+
++--------------------+-----------------+-------+
+|            District|         Of State|  AvAge|
++--------------------+-----------------+-------+
+|     Lahul and Spiti| Himachal Pradesh|56.0000|
+|        Kamrup Metro|            Assam|37.3452|
+|     West Garo Hills|        Meghalaya|37.0917|
+|     East Garo Hills|        Meghalaya|33.9200|
+|            Junagadh|          Gujarat|33.7692|
+|           Porbandar|          Gujarat|33.5667|
+|             Ri Bhoi|        Meghalaya|33.5082|
+|South West Khasi ...|        Meghalaya|33.5000|
+|  West Jaintia Hills|        Meghalaya|33.1039|
+|                 Diu|    Daman and Diu|33.0000|
+|             Kolkata|      West Bengal|32.9719|
+|           Jalandhar|           Punjab|32.7766|
+|             Jashpur|     Chhattisgarh|31.8000|
+|            Srinagar|Jammu and Kashmir|31.7931|
+|               Udupi|        Karnataka|31.7833|
+|          Kapurthala|           Punjab|31.7156|
+|           South Goa|              Goa|31.7093|
+|                Moga|           Punjab|31.5075|
+|              Cachar|            Assam|31.3373|
+|            Tinsukia|            Assam|31.2667|
++--------------------+-----------------+-------+
+
+//Get the top enrolment agency having heighest rejection ratio
+
+aadharData.withColumn("EnRej", when(col("Enrolment Rejected") > 0, 1).otherwise(0))
+         .groupBy("Enrolment Agency")
+         .agg("EnRej" -> "sum", "EnRej" -> "count")
+         .withColumn("RejectionRatio",col("sum(EnRej)")*100/col("count(EnRej)"))
+         .orderBy(col("RejectionRatio").desc)
+         .show()
+
++--------------------+----------+------------+-----------------+
+|    Enrolment Agency|sum(EnRej)|count(EnRej)|   RejectionRatio|
++--------------------+----------+------------+-----------------+
+|     CO REBO PERGING|         5|           5|            100.0|
+|Rural Environment...|         1|           1|            100.0|
+|Vedavaag Systems ...|         1|           1|            100.0|
+|           GrapeSoft|         1|           1|            100.0|
+|Sri Ramraja Sarka...|         1|           1|            100.0|
+|     WCD Govt. of MP|         5|           5|            100.0|
+|E-Seva Society Co...|         2|           2|            100.0|
+|E-Seva Society Su...|        13|          13|            100.0|
+|     DIT Lakshadweep|         4|           4|            100.0|
+|NPS Technologies ...|         2|           2|            100.0|
+|The Chief Postmas...|         2|           2|            100.0|
+|VIRGO SOFTECH LIM...|         1|           1|            100.0|
+| UT of Daman and Diu|        22|          22|            100.0|
+|MACRO INFOTECH PV...|         1|           1|            100.0|
+|E-Seva Society Ju...|        12|          13| 92.3076923076923|
+|Jilla E-Seva Soci...|        34|          37|91.89189189189189|
+|E-Seva Society Ja...|         8|           9|88.88888888888889|
+|Jilla E-seva Sada...|        24|          27|88.88888888888889|
+|Make India Smart ...|        71|          81|87.65432098765432|
+|Jilla E-Seva Soci...|        21|          24|             87.5|
++--------------------+----------+------------+-----------------+
+
