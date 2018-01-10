@@ -118,3 +118,103 @@ aadharData.groupBy("State","Gender")
 |      AISECT Limited| 6717|
 |AKSH OPTIFIBRE LI...|   58|
 +--------------------+-----+
+
+//Top 20 Enrollment Agency with max Identities generator
+
+aadharData.groupBy("Enrolment Agency")
+      .count()
+      .withColumnRenamed("count", "Cnt")
+      .orderBy(org.apache.spark.sql.functions.col("Cnt").desc)
+      .show()
+ +--------------------+-----+
+|    Enrolment Agency|  Cnt|
++--------------------+-----+
+|             CSC SPV|34175|
+|             Akshaya| 8501|
+|  Directorate of ESD| 7499|
+|Apnatech Consulta...| 7144|
+|      AISECT Limited| 6717|
+|  Mahaonline Limited| 6361|
+|IPS e Services Pv...| 5455|
+|Twinstar Industri...| 4997|
+|Electronic Servic...| 4723|
+| United Telecoms Ltd| 4443|
+|Squaria Global In...| 4366|
+|      SARADA SYSTEMS| 3571|
+|COMTECHINFO SOLUT...| 3516|
+|Indotech Engineer...| 3440|
+|SREI INFRASTRUCTU...| 3381|
+|Youth Infosolutio...| 3270|
+|Sarvalabh Global ...| 3004|
+|M/s TAVASYA VENTU...| 2936|
+|M/s Highway Const...| 2734|
+|        Computer LAB| 2490|
++--------------------+-----+
+
+//Top 20 districts(their state as well) with maximum identities generated for both Male and Female 
+aadharData.groupBy("District","State")
+      .count()
+      .withColumnRenamed("count", "Cnt")
+      .orderBy(org.apache.spark.sql.functions.col("Cnt").desc)
+      .select("District","State","Cnt")
+      .withColumnRenamed("State", "Of State")
+      .show()
+
++-----------------+-------------+----+
+|         District|     Of State| Cnt|
++-----------------+-------------+----+
+|           Ganjam|       Odisha|2138|
+|          Bhojpur|        Bihar|1897|
+|       Barddhaman|  West Bengal|1890|
+|            Siwan|        Bihar|1796|
+|         Azamgarh|Uttar Pradesh|1774|
+|      Muzaffarpur|        Bihar|1771|
+|       Samastipur|        Bihar|1758|
+|   East Champaran|        Bihar|1743|
+|         Vaishali|        Bihar|1709|
+|        Allahabad|Uttar Pradesh|1686|
+|North 24 Parganas|  West Bengal|1649|
+|           Budaun|Uttar Pradesh|1564|
+|       Malappuram|       Kerala|1496|
+|          Lucknow|Uttar Pradesh|1418|
+|            Patna|        Bihar|1395|
+|South 24 Parganas|  West Bengal|1377|
+|     Kanpur Nagar|Uttar Pradesh|1363|
+|             Agra|Uttar Pradesh|1305|
+|      Bulandshahr|Uttar Pradesh|1273|
+|            Saran|        Bihar|1261|
++-----------------+-------------+----+
+
+// Top District with max average Age of Residents
+
+aadharData.groupBy("District","State")
+      .agg("Age" -> "avg")
+      .withColumnRenamed("avg(Age)", "Avg Age")
+      .select("District","State","Avg Age")
+      .withColumnRenamed("State", "Of State")
+      .orderBy(org.apache.spark.sql.functions.col("Avg Age").desc)
+      .show()
++--------------------+-----------------+------------------+
+|            District|         Of State|           Avg Age|
++--------------------+-----------------+------------------+
+|     Lahul and Spiti| Himachal Pradesh|              56.0|
+|        Kamrup Metro|            Assam|37.345238095238095|
+|     West Garo Hills|        Meghalaya|37.091743119266056|
+|     East Garo Hills|        Meghalaya|             33.92|
+|            Junagadh|          Gujarat| 33.76923076923077|
+|           Porbandar|          Gujarat| 33.56666666666667|
+|             Ri Bhoi|        Meghalaya| 33.50819672131148|
+|South West Khasi ...|        Meghalaya|              33.5|
+|  West Jaintia Hills|        Meghalaya|33.103896103896105|
+|                 Diu|    Daman and Diu|              33.0|
+|             Kolkata|      West Bengal|  32.9719222462203|
+|           Jalandhar|           Punjab|32.776595744680854|
+|             Jashpur|     Chhattisgarh|              31.8|
+|            Srinagar|Jammu and Kashmir| 31.79310344827586|
+|               Udupi|        Karnataka|31.783333333333335|
+|          Kapurthala|           Punjab| 31.71563981042654|
+|           South Goa|              Goa|31.709333333333333|
+|                Moga|           Punjab|31.507462686567163|
+|              Cachar|            Assam| 31.33730158730159|
+|            Tinsukia|            Assam|31.266666666666666|
++--------------------+-----------------+------------------+
